@@ -114,9 +114,9 @@ impl server::Handler for Server {
     async fn auth_publickey(
         &mut self,
         user: &str,
-        public_key: &key::PublicKey,
+        _public_key: &key::PublicKey,
     ) -> Result<server::Auth, Self::Error> {
-        info!(%user, ?public_key, "auth_publickey");
+        info!(%user, "auth_publickey");
         Ok(server::Auth::Accept)
     }
 
