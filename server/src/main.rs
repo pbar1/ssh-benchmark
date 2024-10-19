@@ -1,21 +1,20 @@
-use std::collections::HashMap;
+#![warn(clippy::pedantic)]
+
 use std::sync::Arc;
 
 use anyhow::Context;
 use anyhow::Result;
 use async_trait::async_trait;
 use clap::Parser;
-use russh::keys::*;
+use russh::keys::key;
 use russh::server;
 use russh::server::Msg;
 use russh::server::Server as _;
 use russh::server::Session;
+use russh::Channel;
 use russh::ChannelId;
-use russh::*;
-use tokio::sync::Mutex;
+use russh::CryptoVec;
 use tracing::error;
-use tracing::info;
-use tracing::instrument;
 use tracing_glog::Glog;
 use tracing_glog::GlogFields;
 use tracing_glog::LocalTime;
@@ -31,7 +30,7 @@ struct Cli {
     port: u16,
 
     /// Log level for stderr
-    #[clap(short, long, default_value = "info", env = "RUST_LOG")]
+    #[clap(short, long, default_value = "error", env = "RUST_LOG")]
     log_level: String,
 }
 
@@ -60,15 +59,12 @@ async fn main() -> Result<()> {
         auth_rejection_time: std::time::Duration::from_secs(3),
         auth_rejection_time_initial: Some(std::time::Duration::from_secs(0)),
         keys: vec![
-            russh_keys::key::KeyPair::generate_ed25519().context("unable to generate keypare")?
+            russh_keys::key::KeyPair::generate_ed25519().context("unable to generate keypair")?
         ],
         ..Default::default()
     };
     let config = Arc::new(config);
-    let mut sh = Server {
-        clients: Arc::new(Mutex::new(HashMap::new())),
-        id: 0,
-    };
+    let mut sh = Server;
     sh.run_on_address(config, ("0.0.0.0", cli.port)).await?;
 
     Ok(())
@@ -77,17 +73,12 @@ async fn main() -> Result<()> {
 // SSH ------------------------------------------------------------------------
 
 #[derive(Clone)]
-struct Server {
-    clients: Arc<Mutex<HashMap<(usize, ChannelId), russh::server::Handle>>>,
-    id: usize,
-}
+struct Server;
 
 impl server::Server for Server {
     type Handler = Self;
     fn new_client(&mut self, _: Option<std::net::SocketAddr>) -> Self {
-        let s = self.clone();
-        self.id += 1;
-        s
+        Self
     }
     fn handle_session_error(&mut self, error: <Self::Handler as russh::server::Handler>::Error) {
         error!(?error, "session error");
@@ -100,42 +91,35 @@ impl server::Handler for Server {
 
     async fn channel_open_session(
         &mut self,
-        channel: Channel<Msg>,
-        session: &mut Session,
+        _channel: Channel<Msg>,
+        _session: &mut Session,
     ) -> Result<bool, Self::Error> {
-        info!(?channel, "channel_open_session");
-        {
-            let mut clients = self.clients.lock().await;
-            clients.insert((self.id, channel.id()), session.handle());
-        }
         Ok(true)
     }
 
     async fn auth_publickey(
         &mut self,
-        user: &str,
+        _user: &str,
         _public_key: &key::PublicKey,
     ) -> Result<server::Auth, Self::Error> {
-        info!(%user, "auth_publickey");
         Ok(server::Auth::Accept)
     }
 
     async fn auth_password(
         &mut self,
-        user: &str,
-        password: &str,
+        _user: &str,
+        _password: &str,
     ) -> Result<server::Auth, Self::Error> {
-        info!(%user, %password, "auth_password");
         Ok(server::Auth::Accept)
     }
 
+    /// Simply return the requested command on stdout, and exit code 0.
     async fn exec_request(
         &mut self,
         channel: ChannelId,
         data: &[u8],
         session: &mut Session,
     ) -> Result<(), Self::Error> {
-        info!(%channel, data = String::from_utf8_lossy(data).to_string(), "exec_request");
         session.data(channel, CryptoVec::from_slice(data));
         session.exit_status_request(channel, 0);
         session.eof(channel);

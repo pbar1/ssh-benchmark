@@ -25,6 +25,11 @@ spec:
         ports:
         - containerPort: 2222
           name: ssh
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
 ---
 apiVersion: v1
 kind: Service
