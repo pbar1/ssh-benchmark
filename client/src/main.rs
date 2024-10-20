@@ -1,7 +1,9 @@
 #![warn(clippy::pedantic)]
 
 use std::io::IsTerminal;
+use std::net::Ipv4Addr;
 use std::net::SocketAddr;
+use std::net::SocketAddrV4;
 use std::net::ToSocketAddrs;
 use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
@@ -130,7 +132,7 @@ async fn real_main(cli: Cli) -> Result<()> {
     while let Some(result) = tasks.next().await {
         Span::current().pb_inc(1);
         if let Err(error) = result {
-            error!(?error, "task join error ");
+            error!(?error, "task join error");
         }
     }
 
@@ -201,7 +203,13 @@ async fn connect_and_run(
         ..Default::default()
     };
     let config = Arc::new(config);
-    let mut session = russh::client::connect(config, target, SshClientHandler).await?;
+
+    let socket = tokio::net::TcpSocket::new_v4()?;
+    socket.set_reuseport(true)?;
+    socket.bind(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 0).into())?;
+    let stream = socket.connect(target).await?;
+
+    let mut session = russh::client::connect_stream(config, stream, SshClientHandler).await?;
 
     session.authenticate_password(user, password).await?;
 
