@@ -1,0 +1,19 @@
+version: "3"
+
+tasks:
+  default: task --list
+
+  nix:ping:
+    desc: Pings the Nix store used for remote build
+    cmds:
+    - nix store ping --store ssh-ng://nixos@tec
+
+  server:build:
+    desc: Builds server
+    cmds:
+    - nix build .#server
+
+  # server:image:
+  #   cmds:
+  #   - rsync --recursive --delete --exclude='.git*' --filter='dir-merge,- .gitignore' $PWD/* nixos@tec.lan:~/ssh-benchmark
+  #   - ssh nixos@tec.lan 'nix  ~/ssh-benchmark#serverImage'
