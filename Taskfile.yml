@@ -3,17 +3,8 @@ version: "3"
 tasks:
   default: task --list
 
-  nix:ping:
-    desc: Pings the Nix store used for remote build
-    cmds:
-    - nix store ping --store ssh-ng://nixos@tec
+  img:server:
+    cmd: docker build --file server/Dockerfile --tag ghcr.io/pbar1/ssh-benchmark-server:latest .
 
-  server:build:
-    desc: Builds server
-    cmds:
-    - nix build .#server
-
-  # server:image:
-  #   cmds:
-  #   - rsync --recursive --delete --exclude='.git*' --filter='dir-merge,- .gitignore' $PWD/* nixos@tec.lan:~/ssh-benchmark
-  #   - ssh nixos@tec.lan 'nix  ~/ssh-benchmark#serverImage'
+  img:client:
+    cmd: docker build --file client/Dockerfile --tag ghcr.io/pbar1/ssh-benchmark-client:latest .
