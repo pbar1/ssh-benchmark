@@ -130,7 +130,7 @@ async fn real_main(cli: Cli) -> Result<()> {
     while let Some(result) = tasks.next().await {
         Span::current().pb_inc(1);
         if let Err(error) = result {
-            error!(?error, "task join error");
+            error!(?error, "task join error ");
         }
     }
 
