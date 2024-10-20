@@ -26,19 +26,23 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build and push (server)
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         file: server/Dockerfile
         context: .
         platforms: linux/amd64
         push: true
         tags: ghcr.io/pbar1/ssh-benchmark-server:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Build and push (client)
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         file: client/Dockerfile
         context: .
         platforms: linux/amd64
         push: true
         tags: ghcr.io/pbar1/ssh-benchmark-client:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
