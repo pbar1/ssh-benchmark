@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: client-50
+  name: client-1
   namespace: ssh-benchmark
 spec:
   template:

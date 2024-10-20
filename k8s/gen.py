@@ -23,8 +23,8 @@ server_svc = {
         "selector": {"app": "server"},
         "clusterIP": "None",
         "ports": [
-            {"name": f"port-{i}", "port": i, "targetPort": "ssh"}
-            for i in range(1, 1001)
+            {"name": f"ssh-{i}", "port": 20000 + i, "targetPort": f"ssh-{i}"}
+            for i in range(100)
         ],
     },
 }
@@ -38,7 +38,7 @@ server_sts = {
     },
     "spec": {
         "serviceName": "server",
-        "replicas": 10,
+        "replicas": 1,
         "selector": {"matchLabels": {"app": "server"}},
         "template": {
             "metadata": {"labels": {"app": "server"}},
@@ -47,12 +47,14 @@ server_sts = {
                     {
                         "name": "server",
                         "image": "ghcr.io/pbar1/ssh-benchmark-server:latest",
-                        "ports": [{"containerPort": 22, "name": "ssh"}],
+                        "command": ["--port", 20000 + i],
+                        "ports": [{"containerPort": 20000 + i, "name": f"ssh-{i}"}],
                         "resources": {
                             "limits": {"memory": "100Mi"},
                             "requests": {"memory": "100Mi"},
                         },
                     }
+                    for i in range(10)
                 ],
             },
         },

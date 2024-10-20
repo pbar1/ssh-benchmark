@@ -1,5 +1,6 @@
 #![warn(clippy::pedantic)]
 
+use std::collections::HashSet;
 use std::io::IsTerminal;
 use std::net::Ipv4Addr;
 use std::net::SocketAddr;
@@ -105,26 +106,48 @@ async fn main() -> Result<()> {
 
 static ACTIVE: AtomicUsize = AtomicUsize::new(0);
 
+fn gen_targets(exclude_local_ports: HashSet<u16>) -> Vec<(SocketAddr, SocketAddr)> {
+    let mut local_addrs: Vec<SocketAddr> = Vec::new();
+    for local_port in 1..65535 {
+        if exclude_local_ports.contains(&local_port) {
+            continue;
+        }
+        local_addrs.push(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, local_port).into());
+    }
+
+    let mut remote_addrs: Vec<SocketAddr> = Vec::new();
+    for remote_idx in 0..10 {
+        let remote_addr = format!("server-{remote_idx}.server:0")
+            .to_socket_addrs()
+            .unwrap()
+            .next()
+            .unwrap();
+        for i in 0..100 {
+            let remote_port = 20000 + i;
+            remote_addrs.push(SocketAddr::new(remote_addr.ip(), remote_port));
+        }
+    }
+
+    let mut addrs = Vec::new();
+    for local in local_addrs {
+        for remote in remote_addrs.iter() {
+            addrs.push((local, remote.to_owned()));
+        }
+    }
+
+    addrs
+}
+
 #[instrument(skip_all, fields(indicatif.pb_show))]
 async fn real_main(cli: Cli) -> Result<()> {
-    // Setup progress bar goal
-    Span::current().pb_set_length(cli.tasks as u64);
-
     let metrics = tokio::runtime::Handle::current().metrics();
     info!(workers = metrics.num_workers(),);
 
-    let server_addrs: Vec<SocketAddr> = cli
-        .addrs
-        .into_iter()
-        .filter_map(|s| s.to_socket_addrs().ok().and_then(|mut x| x.next()))
-        .collect();
-    let server_count = server_addrs.len();
+    let addrs = gen_targets(HashSet::from([6669]));
+    Span::current().pb_set_length(addrs.len() as u64);
 
-    let stream = futures::stream::iter(0..cli.tasks).map(|n| {
-        let ip = server_addrs.get(n % server_count).unwrap().ip();
-        let addr = SocketAddr::new(ip, 2222);
-        do_work(n, addr)
-    });
+    let stream = futures::stream::iter(addrs.into_iter().enumerate())
+        .map(|(n, (local, remote))| do_work(n, local, remote));
 
     let mut tasks = TaskReactor::buffer_spawned(cli.concurrency, stream);
 
@@ -139,14 +162,14 @@ async fn real_main(cli: Cli) -> Result<()> {
 }
 
 /// Simulates some work that takes some time and can time out
-async fn do_work(n: usize, addr: SocketAddr) {
+async fn do_work(n: usize, local: SocketAddr, remote: SocketAddr) {
     let total_tasks = ACTIVE.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
     let metrics = tokio::runtime::Handle::current().metrics();
     let runtime_tasks = metrics.num_alive_tasks();
 
     let result = tokio::time::timeout(
         Duration::from_secs(15),
-        connect_and_run(addr, "user", "password", "whoami"),
+        connect_and_run(local, remote, "user", "password", "whoami"),
     )
     .await;
 
@@ -192,7 +215,8 @@ struct RunOutput {
 }
 
 async fn connect_and_run(
-    target: SocketAddr,
+    local: SocketAddr,
+    remote: SocketAddr,
     user: &str,
     password: &str,
     command: &str,
@@ -205,8 +229,8 @@ async fn connect_and_run(
 
     let socket = tokio::net::TcpSocket::new_v4()?;
     socket.set_reuseport(true)?;
-    socket.bind(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 0).into())?;
-    let stream = socket.connect(target).await?;
+    socket.bind(local)?;
+    let stream = socket.connect(remote).await?;
 
     let mut session = russh::client::connect_stream(config, stream, SshClientHandler).await?;
 

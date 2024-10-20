@@ -4,7 +4,7 @@ metadata:
   name: server
   namespace: ssh-benchmark
 spec:
-  replicas: 10
+  replicas: 1
   selector:
     matchLabels:
       app: server
@@ -15,11 +15,131 @@ spec:
         app: server
     spec:
       containers:
-      - image: ghcr.io/pbar1/ssh-benchmark-server:latest
+      - command:
+        - --port
+        - 20000
+        image: ghcr.io/pbar1/ssh-benchmark-server:latest
         name: server
         ports:
-        - containerPort: 22
-          name: ssh
+        - containerPort: 20000
+          name: ssh-0
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
+      - command:
+        - --port
+        - 20001
+        image: ghcr.io/pbar1/ssh-benchmark-server:latest
+        name: server
+        ports:
+        - containerPort: 20001
+          name: ssh-1
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
+      - command:
+        - --port
+        - 20002
+        image: ghcr.io/pbar1/ssh-benchmark-server:latest
+        name: server
+        ports:
+        - containerPort: 20002
+          name: ssh-2
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
+      - command:
+        - --port
+        - 20003
+        image: ghcr.io/pbar1/ssh-benchmark-server:latest
+        name: server
+        ports:
+        - containerPort: 20003
+          name: ssh-3
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
+      - command:
+        - --port
+        - 20004
+        image: ghcr.io/pbar1/ssh-benchmark-server:latest
+        name: server
+        ports:
+        - containerPort: 20004
+          name: ssh-4
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
+      - command:
+        - --port
+        - 20005
+        image: ghcr.io/pbar1/ssh-benchmark-server:latest
+        name: server
+        ports:
+        - containerPort: 20005
+          name: ssh-5
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
+      - command:
+        - --port
+        - 20006
+        image: ghcr.io/pbar1/ssh-benchmark-server:latest
+        name: server
+        ports:
+        - containerPort: 20006
+          name: ssh-6
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
+      - command:
+        - --port
+        - 20007
+        image: ghcr.io/pbar1/ssh-benchmark-server:latest
+        name: server
+        ports:
+        - containerPort: 20007
+          name: ssh-7
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
+      - command:
+        - --port
+        - 20008
+        image: ghcr.io/pbar1/ssh-benchmark-server:latest
+        name: server
+        ports:
+        - containerPort: 20008
+          name: ssh-8
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
+      - command:
+        - --port
+        - 20009
+        image: ghcr.io/pbar1/ssh-benchmark-server:latest
+        name: server
+        ports:
+        - containerPort: 20009
+          name: ssh-9
         resources:
           limits:
             memory: 100Mi
