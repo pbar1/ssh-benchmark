@@ -37,10 +37,14 @@ metadata:
   name: ssh
   namespace: ssh-test
 spec:
-  type: LoadBalancer
   selector:
     app: ssh
+  clusterIP: None # headless service
   ports:
-  - port: 2222
-    targetPort: 2222
+  - name: port-0
+    port: 2222
+    targetPort: ssh
+  - name: port-1
+    port: 2223
+    targetPort: ssh
 

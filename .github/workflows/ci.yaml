@@ -30,6 +30,15 @@ jobs:
       with:
         file: server/Dockerfile
         context: .
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
         push: true
         tags: ghcr.io/pbar1/ssh-benchmark-server:latest
+
+    - name: Build and push (client)
+      uses: docker/build-push-action@v5
+      with:
+        file: client/Dockerfile
+        context: .
+        platforms: linux/amd64
+        push: true
+        tags: ghcr.io/pbar1/ssh-benchmark-client:latest
