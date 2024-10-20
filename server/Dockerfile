@@ -20,3 +20,4 @@ FROM debian:bookworm-slim AS runtime
 WORKDIR /app
 COPY --from=builder /app/target/release/server /usr/local/bin
 ENTRYPOINT ["/usr/local/bin/server"]
+LABEL org.opencontainers.image.source https://github.com/pbar1/ssh-benchmark
