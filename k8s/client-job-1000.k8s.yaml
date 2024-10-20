@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: client-50
+  namespace: ssh-benchmark
+spec:
+  template:
+    spec:
+      containers:
+      - command:
+        - client
+        - --concurrency=1000
+        - --addrs=server-4.server:234
+        image: ghcr.io/pbar1/ssh-benchmark-client:latest
+        name: client
+      restartPolicy: Never

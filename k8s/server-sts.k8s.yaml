@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: server
+  namespace: ssh-benchmark
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: server
+  serviceName: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+      - image: ghcr.io/pbar1/ssh-benchmark-server:latest
+        name: server
+        ports:
+        - containerPort: 22
+          name: ssh
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi

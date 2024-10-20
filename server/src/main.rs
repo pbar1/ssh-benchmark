@@ -25,8 +25,12 @@ use tracing_subscriber::Layer;
 /// Dummy SSH server that uses as few resources as possible
 #[derive(Debug, Parser)]
 struct Cli {
+    /// Address for SSH server to bind to.
+    #[clap(short, long, default_value = "0.0.0.0")]
+    addr: String,
+
     /// Port for SSH server to bind to.
-    #[clap(short, long, default_value_t = 2222)]
+    #[clap(short, long, default_value_t = 22)]
     port: u16,
 
     /// Log level for stderr
@@ -65,7 +69,7 @@ async fn main() -> Result<()> {
     };
     let config = Arc::new(config);
     let mut sh = Server;
-    sh.run_on_address(config, ("0.0.0.0", cli.port)).await?;
+    sh.run_on_address(config, (cli.addr, cli.port)).await?;
 
     Ok(())
 }
