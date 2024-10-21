@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: client-1000000
+  namespace: ssh-benchmark
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+      - command:
+        - client
+        - --concurrency=1000000
+        env:
+        - name: TOKIO_CONSOLE_BIND
+          value: 0.0.0.0:6669
+        image: ghcr.io/pbar1/ssh-benchmark-client:latest
+        name: client
+        ports:
+        - containerPort: 6669
+          name: tokio-console
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            memory: 4Gi
+      restartPolicy: Never
