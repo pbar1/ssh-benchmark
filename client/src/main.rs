@@ -116,7 +116,7 @@ fn gen_targets(exclude_local_ports: HashSet<u16>) -> Vec<(SocketAddr, SocketAddr
     }
 
     let mut remote_addrs: Vec<SocketAddr> = Vec::new();
-    for remote_idx in 0..10 {
+    for remote_idx in 0..1 {
         let remote_addr = format!("server-{remote_idx}.server:20000")
             .to_socket_addrs()
             .unwrap()
