@@ -32,6 +32,10 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::Layer;
 
+#[cfg(not(target_env = "msvc"))]
+#[global_allocator]
+static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+
 /// Dummy SSH client that uses as many resources as possible
 #[derive(Debug, Parser)]
 struct Cli {
