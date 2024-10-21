@@ -35,20 +35,12 @@ use tracing_subscriber::Layer;
 /// Dummy SSH client that uses as many resources as possible
 #[derive(Debug, Parser)]
 struct Cli {
-    /// Total number of tasks
-    #[clap(short, long, default_value_t = 10_000_000)]
-    tasks: usize,
-
     /// Number of concurrent tasks to run at once
     #[clap(short, long, default_value_t = 50)]
     concurrency: usize,
 
-    /// Server target addresses to resolve
-    #[clap(short, long, default_value = "ssh-0:2222")]
-    addrs: Vec<String>,
-
     /// Log level for stderr
-    #[clap(short, long, default_value = "error", env = "RUST_LOG")]
+    #[clap(short, long, default_value = "info", env = "RUST_LOG")]
     log_level: String,
 }
 
@@ -141,11 +133,12 @@ fn gen_targets(exclude_local_ports: HashSet<u16>) -> Vec<(SocketAddr, SocketAddr
 #[instrument(skip_all, fields(indicatif.pb_show))]
 async fn real_main(cli: Cli) -> Result<()> {
     let metrics = tokio::runtime::Handle::current().metrics();
-    info!(workers = metrics.num_workers(),);
+    let parallelism = std::thread::available_parallelism().unwrap().get();
+    info!(tokio_workers = metrics.num_workers(), parallelism);
 
     let addrs = gen_targets(HashSet::from([6669]));
     let jobs = addrs.len();
-    error!(jobs, "num jobs (not error)");
+    info!(jobs);
     Span::current().pb_set_length(jobs as u64);
 
     let stream = futures::stream::iter(addrs.into_iter().enumerate())

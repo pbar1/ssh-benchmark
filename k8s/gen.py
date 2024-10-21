@@ -73,6 +73,7 @@ def client_job(concurrency: int) -> dict:
         "spec": {
             "backoffLimit": 0,
             "template": {
+                "metadata": {"labels": {"app": "client"}},
                 "spec": {
                     "containers": [
                         {
@@ -82,6 +83,11 @@ def client_job(concurrency: int) -> dict:
                                 "client",
                                 f"--concurrency={concurrency}",
                             ],
+                            "env": [
+                                {"name": "TOKIO_CONSOLE_BIND", "value": "0.0.0.0:6669"},
+                                {"name": "RUST_LOG", "value": "info"},
+                            ],
+                            "ports": [{"containerPort": 6669, "name": "tokio-console"}],
                             "resources": {
                                 "limits": {"memory": "3Gi"},
                                 "requests": {"memory": "3Gi"},
@@ -95,6 +101,23 @@ def client_job(concurrency: int) -> dict:
     }
 
 
+client_svc = {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "name": "client",
+        "namespace": name,
+    },
+    "spec": {
+        "selector": {"app": "client"},
+        "type": "LoadBalancer",
+        "ports": [
+            {"name": "tokio-console", "port": 6669, "targetPort": "tokio-console"}
+        ],
+    },
+}
+
+
 with open("ns.k8s.yaml", "w") as f:
     f.write(yaml.safe_dump(ns))
 
@@ -106,3 +129,5 @@ with open("server-sts.k8s.yaml", "w") as f:
 for c in [1, 10, 100, 1000, 10000]:
     with open(f"client-job-{c}.k8s.yaml", "w") as f:
         f.write(yaml.safe_dump(client_job(c)))
+with open("client-svc.k8s.yaml", "w") as f:
+    f.write(yaml.safe_dump(client_svc))

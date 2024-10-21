@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: client
+  namespace: ssh-benchmark
+spec:
+  ports:
+  - name: tokio-console
+    port: 6669
+    targetPort: tokio-console
+  selector:
+    app: client
+  type: LoadBalancer
