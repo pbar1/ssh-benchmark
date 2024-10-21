@@ -16,10 +16,10 @@ spec:
     spec:
       containers:
       - command:
-        - --port
-        - 20000
+        - server
+        - --port=20000
         image: ghcr.io/pbar1/ssh-benchmark-server:latest
-        name: server
+        name: server-0
         ports:
         - containerPort: 20000
           name: ssh-0
@@ -29,10 +29,10 @@ spec:
           requests:
             memory: 100Mi
       - command:
-        - --port
-        - 20001
+        - server
+        - --port=20001
         image: ghcr.io/pbar1/ssh-benchmark-server:latest
-        name: server
+        name: server-1
         ports:
         - containerPort: 20001
           name: ssh-1
@@ -42,10 +42,10 @@ spec:
           requests:
             memory: 100Mi
       - command:
-        - --port
-        - 20002
+        - server
+        - --port=20002
         image: ghcr.io/pbar1/ssh-benchmark-server:latest
-        name: server
+        name: server-2
         ports:
         - containerPort: 20002
           name: ssh-2
@@ -55,10 +55,10 @@ spec:
           requests:
             memory: 100Mi
       - command:
-        - --port
-        - 20003
+        - server
+        - --port=20003
         image: ghcr.io/pbar1/ssh-benchmark-server:latest
-        name: server
+        name: server-3
         ports:
         - containerPort: 20003
           name: ssh-3
@@ -68,10 +68,10 @@ spec:
           requests:
             memory: 100Mi
       - command:
-        - --port
-        - 20004
+        - server
+        - --port=20004
         image: ghcr.io/pbar1/ssh-benchmark-server:latest
-        name: server
+        name: server-4
         ports:
         - containerPort: 20004
           name: ssh-4
@@ -81,10 +81,10 @@ spec:
           requests:
             memory: 100Mi
       - command:
-        - --port
-        - 20005
+        - server
+        - --port=20005
         image: ghcr.io/pbar1/ssh-benchmark-server:latest
-        name: server
+        name: server-5
         ports:
         - containerPort: 20005
           name: ssh-5
@@ -94,10 +94,10 @@ spec:
           requests:
             memory: 100Mi
       - command:
-        - --port
-        - 20006
+        - server
+        - --port=20006
         image: ghcr.io/pbar1/ssh-benchmark-server:latest
-        name: server
+        name: server-6
         ports:
         - containerPort: 20006
           name: ssh-6
@@ -107,10 +107,10 @@ spec:
           requests:
             memory: 100Mi
       - command:
-        - --port
-        - 20007
+        - server
+        - --port=20007
         image: ghcr.io/pbar1/ssh-benchmark-server:latest
-        name: server
+        name: server-7
         ports:
         - containerPort: 20007
           name: ssh-7
@@ -120,10 +120,10 @@ spec:
           requests:
             memory: 100Mi
       - command:
-        - --port
-        - 20008
+        - server
+        - --port=20008
         image: ghcr.io/pbar1/ssh-benchmark-server:latest
-        name: server
+        name: server-8
         ports:
         - containerPort: 20008
           name: ssh-8
@@ -133,10 +133,10 @@ spec:
           requests:
             memory: 100Mi
       - command:
-        - --port
-        - 20009
+        - server
+        - --port=20009
         image: ghcr.io/pbar1/ssh-benchmark-server:latest
-        name: server
+        name: server-9
         ports:
         - containerPort: 20009
           name: ssh-9

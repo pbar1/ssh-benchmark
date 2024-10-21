@@ -10,7 +10,6 @@ spec:
       - command:
         - client
         - --concurrency=100
-        - --addrs=server-4.server:234
         image: ghcr.io/pbar1/ssh-benchmark-client:latest
         name: client
       restartPolicy: Never

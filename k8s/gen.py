@@ -45,9 +45,9 @@ server_sts = {
             "spec": {
                 "containers": [
                     {
-                        "name": "server",
+                        "name": f"server-{i}",
                         "image": "ghcr.io/pbar1/ssh-benchmark-server:latest",
-                        "command": ["--port", 20000 + i],
+                        "command": ["server", f"--port={20000 + i}"],
                         "ports": [{"containerPort": 20000 + i, "name": f"ssh-{i}"}],
                         "resources": {
                             "limits": {"memory": "100Mi"},
@@ -80,7 +80,6 @@ def client_job(concurrency: int) -> dict:
                             "command": [
                                 "client",
                                 f"--concurrency={concurrency}",
-                                "--addrs=server-4.server:234",
                             ],
                         }
                     ],
