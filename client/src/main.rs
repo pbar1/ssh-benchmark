@@ -144,7 +144,9 @@ async fn real_main(cli: Cli) -> Result<()> {
     info!(workers = metrics.num_workers(),);
 
     let addrs = gen_targets(HashSet::from([6669]));
-    Span::current().pb_set_length(addrs.len() as u64);
+    let jobs = addrs.len();
+    error!(jobs, "num jobs (not error)");
+    Span::current().pb_set_length(jobs as u64);
 
     let stream = futures::stream::iter(addrs.into_iter().enumerate())
         .map(|(n, (local, remote))| do_work(n, local, remote));
