@@ -24,7 +24,7 @@ server_svc = {
         "clusterIP": "None",
         "ports": [
             {"name": f"ssh-{i}", "port": 20000 + i, "targetPort": f"ssh-{i}"}
-            for i in range(100)
+            for i in range(10)
         ],
     },
 }
@@ -71,6 +71,7 @@ def client_job(concurrency: int) -> dict:
             "namespace": name,
         },
         "spec": {
+            "backoffLimit": 0,
             "template": {
                 "spec": {
                     "containers": [
@@ -81,11 +82,15 @@ def client_job(concurrency: int) -> dict:
                                 "client",
                                 f"--concurrency={concurrency}",
                             ],
+                            "resources": {
+                                "limits": {"memory": "3Gi"},
+                                "requests": {"memory": "3Gi"},
+                            },
                         }
                     ],
                     "restartPolicy": "Never",
                 },
-            }
+            },
         },
     }
 

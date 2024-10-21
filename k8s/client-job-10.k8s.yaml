@@ -4,6 +4,7 @@ metadata:
   name: client-10
   namespace: ssh-benchmark
 spec:
+  backoffLimit: 0
   template:
     spec:
       containers:
@@ -12,4 +13,9 @@ spec:
         - --concurrency=10
         image: ghcr.io/pbar1/ssh-benchmark-client:latest
         name: client
+        resources:
+          limits:
+            memory: 3Gi
+          requests:
+            memory: 3Gi
       restartPolicy: Never

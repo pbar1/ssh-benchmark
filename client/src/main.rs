@@ -122,7 +122,7 @@ fn gen_targets(exclude_local_ports: HashSet<u16>) -> Vec<(SocketAddr, SocketAddr
             .unwrap()
             .next()
             .unwrap();
-        for i in 0..100 {
+        for i in 0..10 {
             let remote_port = 20000 + i;
             remote_addrs.push(SocketAddr::new(remote_addr.ip(), remote_port));
         }
