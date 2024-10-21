@@ -17,8 +17,6 @@ spec:
         env:
         - name: TOKIO_CONSOLE_BIND
           value: 0.0.0.0:6669
-        - name: RUST_LOG
-          value: info
         image: ghcr.io/pbar1/ssh-benchmark-client:latest
         name: client
         ports:

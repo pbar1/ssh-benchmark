@@ -125,7 +125,7 @@ with open("server-svc.k8s.yaml", "w") as f:
 with open("server-sts.k8s.yaml", "w") as f:
     f.write(yaml.safe_dump(server_sts))
 
-for c in [1, 10, 100, 1000, 10000]:
+for c in [1, 10, 100, 1000, 10000, 100000]:
     with open(f"client-job-{c}.k8s.yaml", "w") as f:
         f.write(yaml.safe_dump(client_job(c)))
 with open("client-svc.k8s.yaml", "w") as f:
