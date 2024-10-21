@@ -26,7 +26,7 @@ spec:
           name: tokio-console
         resources:
           limits:
-            memory: 3Gi
+            memory: 4Gi
           requests:
-            memory: 3Gi
+            memory: 4Gi
       restartPolicy: Never

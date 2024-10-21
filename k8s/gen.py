@@ -85,12 +85,11 @@ def client_job(concurrency: int) -> dict:
                             ],
                             "env": [
                                 {"name": "TOKIO_CONSOLE_BIND", "value": "0.0.0.0:6669"},
-                                {"name": "RUST_LOG", "value": "info"},
                             ],
                             "ports": [{"containerPort": 6669, "name": "tokio-console"}],
                             "resources": {
-                                "limits": {"memory": "3Gi"},
-                                "requests": {"memory": "3Gi"},
+                                "limits": {"memory": "4Gi"},
+                                "requests": {"memory": "4Gi"},
                             },
                         }
                     ],
