@@ -148,13 +148,15 @@ async fn real_main(cli: Cli) -> Result<()> {
     let stream = futures::stream::iter(addrs.into_iter().enumerate())
         .map(|(n, (local, remote))| do_work(n, local, remote));
 
-    let mut tasks = TaskReactor::buffer_spawned(cli.concurrency, stream);
+    // let mut tasks = TaskReactor::buffer_spawned(cli.concurrency, stream);
 
-    while let Some(result) = tasks.next().await {
+    let mut tasks = stream.buffer_unordered(cli.concurrency);
+
+    while let Some(_result) = tasks.next().await {
         Span::current().pb_inc(1);
-        if let Err(error) = result {
-            error!(?error, "task join error");
-        }
+        // if let Err(error) = result {
+        //     error!(?error, "task join error");
+        // }
     }
 
     Ok(())

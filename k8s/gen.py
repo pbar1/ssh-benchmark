@@ -85,6 +85,7 @@ def client_job(concurrency: int) -> dict:
                             ],
                             "env": [
                                 {"name": "TOKIO_CONSOLE_BIND", "value": "0.0.0.0:6669"},
+                                {"name": "TOKIO_CONSOLE_RETENTION", "value": "30s"},
                             ],
                             "ports": [{"containerPort": 6669, "name": "tokio-console"}],
                             "resources": {
